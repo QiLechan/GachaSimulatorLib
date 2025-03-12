@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GachaSimulatorLib.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
