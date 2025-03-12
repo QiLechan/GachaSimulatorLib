@@ -1,12 +1,9 @@
-﻿// GachaSimulatorLib.cpp : 定义静态库的函数。
-//
-
-#include "pch.h"
-#include "framework.h"
-#include <cjson/cJSON.h>
+﻿#include <cjson/cJSON.h>
+#include <string.h>
+#include <stdlib.h>
 
 // 创建原神初始JSON配置
-char* createGenshinJson()
+void createGenshinJson(char* buffer)
 {
 	cJSON* root = cJSON_CreateObject();
 
@@ -49,8 +46,9 @@ char* createGenshinJson()
 	cJSON_AddItemToArray(pools, pool_template);
 
 	char* json = cJSON_Print(root);
+	int size = sizeof(json);
+	strcpy_s(buffer, strlen(json) + 1, json);
 	cJSON_Delete(root);
-	return json;
 }
 
 

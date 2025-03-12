@@ -1,0 +1,27 @@
+{
+	"version":	"1.0.0",
+	"description":	"Ô­Éñ³é¿¨ÅäÖÃ",
+	"global_config":	{
+		"max_pity_counter":	90,
+		"5star":	0.006,
+		"4star":	0.051
+	},
+	"pools":	[{
+			"pool_name":	"³£×¤ÆíÔ¸",
+			"pool_type":	"½ÇÉ«",
+			"rates":	{
+				"5star_soft_pity_start":	74,
+				"5star_rate_increment":	0.06
+			},
+			"pity_rules":	{
+			},
+			"up":	{
+				"5star":	[{
+						"name":	"Sample 5¡ï Character",
+						"id":	10001,
+						"weight":	5000
+					}],
+				"4star":	[]
+			}
+		}]
+}
