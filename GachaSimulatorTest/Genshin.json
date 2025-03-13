@@ -17,6 +17,48 @@
 			},
 			"up":	{
 				"5star":	[{
+						"name":	"可莉骨灰盒",
+						"id":	10001,
+						"weight":	5000
+					}],
+				"4star":	[{
+					"name":	"可莉尸块",
+					"id":	10001,
+					"weight":	5000
+				}]
+			},
+			"others":	{
+				"5star":	[{
+						"name":	"Sample 5★ Character",
+						"id":	10001,
+						"weight":	5000
+					}],
+				"4star":	[]
+			}
+		},
+		{
+			"pool_name":	"限定祈愿",
+			"pool_type":	"角色",
+			"rates":	{
+				"5star_soft_pity_start":	74,
+				"5star_rate_increment":	0.06
+			},
+			"pity_rules":	{
+			},
+			"up":	{
+				"5star":	[{
+						"name":	"纳西妲骨灰盒",
+						"id":	10001,
+						"weight":	5000
+					}],
+				"4star":	[{
+					"name":	"纳西妲尸块",
+					"id":	10001,
+					"weight":	5000
+				}]
+			},
+			"others":	{
+				"5star":	[{
 						"name":	"Sample 5★ Character",
 						"id":	10001,
 						"weight":	5000

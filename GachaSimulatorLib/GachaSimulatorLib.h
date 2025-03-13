@@ -3,7 +3,7 @@
 
 #include <cjson/cJSON.h>
 
-void createGenshinJson(char* buffer);
+char* createGenshinJson();
 
 typedef struct {
 	int max_pity_counter;
@@ -36,7 +36,7 @@ typedef struct {
     int pool_count;
 } GachaConfig;
 
-GlobalConfig parse_global_config(cJSON* global);
 UpItem* parse_up_items(cJSON* up, int* count);
+GachaConfig* parse_config(const char* json);
 
 #endif
