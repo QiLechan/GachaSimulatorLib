@@ -1,6 +1,8 @@
-﻿#include <cjson/cJSON.h>
+﻿#pragma execution_character_set("utf-8")
+#include <cjson/cJSON.h>
 #include <string.h>
 #include <stdlib.h>
+#include "GachaSimulatorLib.h"
 
 // 创建原神初始JSON配置
 void createGenshinJson(char* buffer)
@@ -49,6 +51,71 @@ void createGenshinJson(char* buffer)
 	int size = sizeof(json);
 	strcpy_s(buffer, strlen(json) + 1, json);
 	cJSON_Delete(root);
+}
+
+// 解析全局配置
+GlobalConfig parse_global_config(cJSON* global) {
+	GlobalConfig config = { 0 };
+
+	if (global) {
+		cJSON* item = cJSON_GetObjectItem(global, "global_config");
+		if (cJSON_IsNumber(item)) config.max_pity_counter = item->valueint;
+
+		item = cJSON_GetObjectItem(global, "5star");
+		if (cJSON_IsNumber(item)) config.five_star = item->valuedouble;
+
+		item = cJSON_GetObjectItem(global, "4star");
+		if (cJSON_IsNumber(item)) config.four_star = item->valuedouble;
+	}
+	return config;
+}
+
+// 解析UP数组
+UpItem* parse_up_items(cJSON* array, int* count) {
+	if (!cJSON_IsArray(array)) return NULL;
+
+	int size = cJSON_GetArraySize(array);
+	UpItem* items = calloc(size, sizeof(UpItem));
+	*count = 0;
+
+	cJSON* element;
+	cJSON_ArrayForEach(element, array) {
+		if (cJSON_IsObject(element)) {
+			UpItem item = { 0 };
+
+			cJSON* name = cJSON_GetObjectItem(element, "name");
+			if (cJSON_IsString(name))
+                strncpy_s(item.name, sizeof(item.name), name->valuestring, sizeof(item.name) - 1);
+
+			cJSON* id = cJSON_GetObjectItem(element, "id");
+			if (cJSON_IsNumber(id)) item.id = id->valueint;
+
+			cJSON* weight = cJSON_GetObjectItem(element, "weight");
+			if (cJSON_IsNumber(weight)) item.weight = weight->valuedouble;
+
+			items[(*count)++] = item;
+		}
+	}
+	return items;
+}
+
+//JSON解析主函数
+GachaConfig* parse_config(const char* json)
+{
+	cJSON* root = cJSON_Parse(json);
+	if (!root) {
+		fprintf(stderr, "JSON解析错误: %s\n", cJSON_GetErrorPtr());
+		return NULL;
+	}
+	GachaConfig* config = calloc(1, sizeof(GachaConfig));
+	cJSON* version = cJSON_GetObjectItem(root, "version");
+	if (cJSON_IsString(version))
+		strncpy(config->version, version->valuestring, sizeof(config->version) - 1);
+
+	cJSON* desc = cJSON_GetObjectItem(root, "description");
+	if (cJSON_IsString(desc))
+		strncpy(config->description, desc->valuestring, sizeof(config->description) - 1);
+
 }
 
 

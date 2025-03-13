@@ -1,14 +1,14 @@
 {
 	"version":	"1.0.0",
-	"description":	"Ô­Éñ³é¿¨ÅäÖÃ",
+	"description":	"åŸç¥æŠ½å¡é…ç½®",
 	"global_config":	{
 		"max_pity_counter":	90,
 		"5star":	0.006,
 		"4star":	0.051
 	},
 	"pools":	[{
-			"pool_name":	"³£×¤ÆíÔ¸",
-			"pool_type":	"½ÇÉ«",
+			"pool_name":	"å¸¸é©»ç¥ˆæ„¿",
+			"pool_type":	"è§’è‰²",
 			"rates":	{
 				"5star_soft_pity_start":	74,
 				"5star_rate_increment":	0.06
@@ -17,7 +17,7 @@
 			},
 			"up":	{
 				"5star":	[{
-						"name":	"Sample 5¡ï Character",
+						"name":	"Sample 5â˜… Character",
 						"id":	10001,
 						"weight":	5000
 					}],
