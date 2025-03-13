@@ -2,6 +2,7 @@
 #include <cjson/cJSON.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "GachaSimulatorLib.h"
 
 // 创建原神初始JSON配置
@@ -99,7 +100,7 @@ UpItem* parse_up_items(cJSON* array, int* count) {
 	return items;
 }
 
-//JSON解析主函数
+// JSON解析主函数
 GachaConfig* parse_config(const char* json)
 {
 	cJSON* root = cJSON_Parse(json);
@@ -110,11 +111,24 @@ GachaConfig* parse_config(const char* json)
 	GachaConfig* config = calloc(1, sizeof(GachaConfig));
 	cJSON* version = cJSON_GetObjectItem(root, "version");
 	if (cJSON_IsString(version))
-		strncpy(config->version, version->valuestring, sizeof(config->version) - 1);
+		strncpy_s(config->version, sizeof(config->version), version->valuestring, sizeof(config->version) - 1);
 
 	cJSON* desc = cJSON_GetObjectItem(root, "description");
 	if (cJSON_IsString(desc))
-		strncpy(config->description, desc->valuestring, sizeof(config->description) - 1);
+		strncpy_s(config->description, sizeof(config->description), desc->valuestring, sizeof(config->description) - 1);
+
+	// 解析全局配置
+	cJSON* global = cJSON_GetObjectItem(root, "global_config");
+	if (global) {
+		cJSON* pity = cJSON_GetObjectItem(global, "max_pity_counter");
+		if (cJSON_IsNumber(pity)) config->global.max_pity_counter = pity->valueint;
+
+		cJSON* star5 = cJSON_GetObjectItem(global, "5star");
+		if (cJSON_IsNumber(star5)) config->global.five_star = star5->valuedouble;
+
+		cJSON* star4 = cJSON_GetObjectItem(global, "4star");
+		if (cJSON_IsNumber(star4)) config->global.four_star = star4->valuedouble;
+	}
 
 }
 

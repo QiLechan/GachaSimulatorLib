@@ -25,13 +25,14 @@ int main()
 	fread(json, sizeof(char), size, fp);
 	printf("%s\n", json);
 	cJSON* root = cJSON_Parse(json);
-	int *count = 0;
-	UpItem* up = parse_up_items(root, count);
-	printf("Max Pity Counter: %d\n", config.max_pity_counter);
-	printf("5 Star Prob: %f\n", config.five_star);
-	printf("4 Star Prob: %f\n", config.four_star);
-	printf("Up Item: %s\n", up->name);
+	if (!root) {
+		fprintf(stderr, "JSON解析错误: %s\n", cJSON_GetErrorPtr());
+		return NULL;
+	}
+	GachaConfig* config = calloc(1, sizeof(GachaConfig));
+	cJSON* versions = cJSON_GetObjectItem(root, "version");
+	char* version = cJSON_Print(versions);
+	printf("%s\n", version);
 	free(json);
-	free(up);
 	fclose(fp);
 }
