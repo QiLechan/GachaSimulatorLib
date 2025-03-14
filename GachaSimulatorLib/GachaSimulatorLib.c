@@ -19,6 +19,7 @@ char* createGenshinJson()
 	cJSON_AddNumberToObject(global, "max_pity_counter", 90);		//大保底
 	cJSON_AddNumberToObject(global, "5star", 0.006);				//基础5星概率
 	cJSON_AddNumberToObject(global, "4star", 0.051);				//基础4星概率
+	cJSON_AddNumberToObject(global, "ten_times", 0.006);			//十连5星概率
 
 	//卡池
 	cJSON* pools = cJSON_AddArrayToObject(root, "pools");
@@ -41,10 +42,16 @@ char* createGenshinJson()
 
 	//UP示例
 	cJSON* sample_5star = cJSON_CreateObject();
-	cJSON_AddStringToObject(sample_5star, "name", "Sample 5★ Character");
+	cJSON_AddStringToObject(sample_5star, "name", "五星UP角色");
 	cJSON_AddNumberToObject(sample_5star, "id", 10001);
 	cJSON_AddNumberToObject(sample_5star, "weight", 5000);	//5星权重 总权重10000
 	cJSON_AddItemToArray(five_stars, sample_5star);
+
+	cJSON* sample_4star = cJSON_CreateObject();
+	cJSON_AddStringToObject(sample_4star, "name", "四星UP角色");
+	cJSON_AddNumberToObject(sample_4star, "id", 20001);
+	cJSON_AddNumberToObject(sample_4star, "weight", 5000);	//4星权重 总权重10000
+	cJSON_AddItemToArray(four_stars, sample_4star);
 
 	//UP以外
 	cJSON* others = cJSON_AddObjectToObject(pool_template, "others");
@@ -53,10 +60,16 @@ char* createGenshinJson()
 
 	//UP以外示例
 	sample_5star = cJSON_CreateObject();
-	cJSON_AddStringToObject(sample_5star, "name", "Sample 5★ Character");
+	cJSON_AddStringToObject(sample_5star, "name", "五星角色");
 	cJSON_AddNumberToObject(sample_5star, "id", 10001);
 	cJSON_AddNumberToObject(sample_5star, "weight", 5000);	//5星权重 总权重10000
 	cJSON_AddItemToArray(five_stars, sample_5star);
+
+	sample_4star = cJSON_CreateObject();
+	cJSON_AddStringToObject(sample_4star, "name", "四星角色");
+	cJSON_AddNumberToObject(sample_4star, "id", 10001);
+	cJSON_AddNumberToObject(sample_4star, "weight", 5000);	//4星权重 总权重10000
+	cJSON_AddItemToArray(four_stars, sample_4star);
 
 	cJSON_AddItemToArray(pools, pool_template);
 
@@ -66,29 +79,29 @@ char* createGenshinJson()
 }
 
 // 解析UP物品
-UpItem* parse_up_items(cJSON* array, int* count) {
+Item* parse_items(cJSON* array, int* count) {
 	if (!cJSON_IsArray(array)) return NULL;
 
 	int size = cJSON_GetArraySize(array);
-	UpItem* items = malloc(size * sizeof(UpItem));
+	Item* items = malloc(size * sizeof(Item));
 	*count = 0;
 
 	cJSON* item;
 	cJSON_ArrayForEach(item, array) {
 		if (cJSON_IsObject(item)) {
-			UpItem up = { 0 };
+			Item _item = { 0 };
 
 			cJSON* name = cJSON_GetObjectItem(item, "name");
 			if (cJSON_IsString(name))
-                strncpy_s(up.name, sizeof(up.name), name->valuestring, sizeof(up.name) - 1);
+                strncpy_s(_item.name, sizeof(_item.name), name->valuestring, sizeof(_item.name) - 1);
 
 			cJSON* id = cJSON_GetObjectItem(item, "id");
-			if (cJSON_IsNumber(id)) up.id = id->valueint;
+			if (cJSON_IsNumber(id)) _item.id = id->valueint;
 
 			cJSON* weight = cJSON_GetObjectItem(item, "weight");
-			if (cJSON_IsNumber(weight)) up.weight = weight->valueint;
+			if (cJSON_IsNumber(weight)) _item.weight = weight->valueint;
 
-			items[(*count)++] = up;
+			items[(*count)++] = _item;
 		}
 	}
 	return items;
@@ -121,10 +134,20 @@ GachaPool parse_pool(cJSON* pool_obj) {
 	cJSON* up = cJSON_GetObjectItem(pool_obj, "up");
 	if (up) {
 		cJSON* star5 = cJSON_GetObjectItem(up, "5star");
-		pool.star5_up = parse_up_items(star5, &pool.star5_count);
+		pool.star5_up = parse_items(star5, &pool.star5_count);
 
 		cJSON* star4 = cJSON_GetObjectItem(up, "4star");
-		pool.star4_up = parse_up_items(star4, &pool.star4_count);
+		pool.star4_up = parse_items(star4, &pool.star4_count);
+	}
+
+	// 其他物品
+	cJSON* others = cJSON_GetObjectItem(pool_obj, "others");
+	if (others) {
+		cJSON* star5 = cJSON_GetObjectItem(up, "5star");
+		pool.star5_up = parse_items(star5, &pool.star5_others_count);
+
+		cJSON* star4 = cJSON_GetObjectItem(up, "4star");
+		pool.star4_up = parse_items(star4, &pool.star4_others_count);
 	}
 
 	return pool;
@@ -138,6 +161,8 @@ GachaConfig* parse_config(const char* json)
 		fprintf(stderr, "JSON解析错误: %s\n", cJSON_GetErrorPtr());
 		return NULL;
 	}
+
+	// 解析基本信息
 	GachaConfig* config = calloc(1, sizeof(GachaConfig));
 	cJSON* version = cJSON_GetObjectItem(root, "version");
 	if (cJSON_IsString(version))
@@ -158,6 +183,9 @@ GachaConfig* parse_config(const char* json)
 
 		cJSON* star4 = cJSON_GetObjectItem(global, "4star");
 		if (cJSON_IsNumber(star4)) config->global.four_star = star4->valuedouble;
+
+		cJSON* ten_times = cJSON_GetObjectItem(global, "ten_times");
+		if (cJSON_IsNumber(ten_times)) config->global.ten_times = ten_times->valuedouble;
 	}
 
 	// 解析卡池
@@ -173,6 +201,36 @@ GachaConfig* parse_config(const char* json)
 	}
 	cJSON_Delete(root);
 	return config;
+}
+
+Probability* probability(int times, GlobalConfig* config, GachaPool* pool) {
+	Probability* prob = malloc(sizeof(Probability));
+	int four_stars_times = times % 10;
+	if (times <= pool->soft_pity_start){
+		if (four_stars_times < 10) {
+			prob->star4 = config->four_star;
+			prob->star5 = config->five_star;
+		}
+		else if (four_stars_times = 10) {
+			prob->star5 = config->ten_times;
+			prob->star4 = 1 - prob->star5;
+		}
+	}
+	else {
+		if (four_stars_times < 10) {
+			prob->star4 = config->four_star;
+			prob->star5 = config->five_star + (pool->rate_increment) * (config->max_pity_counter - times);
+		}
+		else if (four_stars_times = 10) {
+			prob->star5 = config->five_star + (pool->rate_increment) * (config->max_pity_counter - times);
+			prob->star4 = 1 - prob->star5;
+		}
+	}
+	return prob;
+}
+
+int Gacha(int times, int counts) {
+
 }
 
 

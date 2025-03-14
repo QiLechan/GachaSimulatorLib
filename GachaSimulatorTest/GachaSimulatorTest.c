@@ -41,12 +41,12 @@ int main()
 			printf("卡池: %s, 类型: %s, 5星保底 %d, 5星递增 %.3f\n", pool.pool_name, pool.pool_type, pool.soft_pity_start, pool.rate_increment);
 			printf("5星UP:\n");
 			for (int j = 0; j < pool.star5_count; j++) {
-				UpItem item = pool.star5_up[j];
+				Item item = pool.star5_up[j];
 				printf("名称: %s, ID: %d, 权重: %d\n", item.name, item.id, item.weight);
 			}
 			printf("4星UP:\n");
 			for (int j = 0; j < pool.star4_count; j++) {
-				UpItem item = pool.star4_up[j];
+				Item item = pool.star4_up[j];
 				printf("名称: %s, ID: %d, 权重: %d\n", item.name, item.id, item.weight);
 			}
 		}
