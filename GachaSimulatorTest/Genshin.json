@@ -4,7 +4,8 @@
 	"global_config":	{
 		"max_pity_counter":	90,
 		"5star":	0.006,
-		"4star":	0.051
+		"4star":	0.051,
+		"ten_times":	0.006
 	},
 	"pools":	[{
 			"pool_name":	"常驻祈愿",

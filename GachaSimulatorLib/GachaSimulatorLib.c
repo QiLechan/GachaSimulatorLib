@@ -203,34 +203,68 @@ GachaConfig* parse_config(const char* json)
 	return config;
 }
 
-Probability* probability(int times, GlobalConfig* config, GachaPool* pool) {
+Probability* probability(int counts, GlobalConfig* config, GachaPool* pool) {
 	Probability* prob = malloc(sizeof(Probability));
-	int four_stars_times = times % 10;
-	if (times <= pool->soft_pity_start){
-		if (four_stars_times < 10) {
-			prob->star4 = config->four_star;
-			prob->star5 = config->five_star;
-		}
-		else if (four_stars_times = 10) {
+	int four_stars_times = counts % 10;
+	if (counts <= pool->soft_pity_start){
+		if (four_stars_times == 0) {
 			prob->star5 = config->ten_times;
 			prob->star4 = 1 - prob->star5;
 		}
+		else{
+			prob->star4 = config->four_star;
+			prob->star5 = config->five_star;
+		}
 	}
 	else {
-		if (four_stars_times < 10) {
-			prob->star4 = config->four_star;
-			prob->star5 = config->five_star + (pool->rate_increment) * (config->max_pity_counter - times);
-		}
-		else if (four_stars_times = 10) {
-			prob->star5 = config->five_star + (pool->rate_increment) * (config->max_pity_counter - times);
+		if (four_stars_times == 0) {
+			prob->star5 = config->five_star + (pool->rate_increment) * (counts - pool->soft_pity_start);
 			prob->star4 = 1 - prob->star5;
+		}
+		else{
+			prob->star4 = config->four_star;
+			prob->star5 = config->five_star + (pool->rate_increment) * (counts - pool->soft_pity_start);
 		}
 	}
 	return prob;
 }
 
-int Gacha(int times, int counts) {
+//随机抽取
+int random(double prob) {
+	double r = (double)rand() / RAND_MAX;
+	if (r < prob) return 1;
+	else return 0;
+}
 
+//抽卡主函数
+//return 3:3星 4:4星 5:5星
+int Gacha(Probability* prob) {
+	double sum = prob->star4 + prob->star5;
+	int sum_random = random(sum);	//以总概率抽取
+	if (sum_random == 1) {
+		double five_random = prob->star5 / sum;
+		int five_star = random(five_random);	//以5星概率抽取
+		if (five_star == 1) return 5;	//返回5星
+		else return 4;	//返回4星
+	}
+	else return 3;	//返回3星
+}
+
+//解析抽卡结果
+void parse_result(int result, FILE* fp) {
+	switch (result) {
+	case 3:
+		fprintf(fp, "抽到了3星\n");
+		break;
+	case 4:
+		fprintf(fp, "抽到了4星\n");
+		break;
+	case 5:
+		fprintf(fp, "抽到了5星\n");
+		break;
+	default:
+		break;
+	}
 }
 
 

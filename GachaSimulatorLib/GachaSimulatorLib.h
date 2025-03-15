@@ -42,10 +42,13 @@ typedef struct {
 } GachaConfig;
 
 typedef struct {
-	int star5;
-	int star4;
+	double star5;
+	double star4;
 } Probability;
 
 GachaConfig* parse_config(const char* json);
+Probability* probability(int times, GlobalConfig* config, GachaPool* pool);
+int Gacha(Probability* prob);
+void parse_result(int result, FILE* fp);
 
 #endif
