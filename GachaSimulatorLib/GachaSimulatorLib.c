@@ -57,6 +57,7 @@ char* createGenshinJson()
 	cJSON* others = cJSON_AddObjectToObject(pool_template, "others");
 	five_stars = cJSON_AddArrayToObject(others, "5star");
 	four_stars = cJSON_AddArrayToObject(others, "4star");
+	cJSON* three_stars = cJSON_AddArrayToObject(others, "3star");
 
 	//UP以外示例
 	sample_5star = cJSON_CreateObject();
@@ -71,6 +72,12 @@ char* createGenshinJson()
 	cJSON_AddNumberToObject(sample_4star, "weight", 5000);	//4星权重 总权重10000
 	cJSON_AddItemToArray(four_stars, sample_4star);
 
+	cJSON* sample_3star = cJSON_CreateObject();
+	cJSON_AddStringToObject(sample_3star, "name", "三星物品");
+	cJSON_AddNumberToObject(sample_3star, "id", 30001);
+	cJSON_AddNumberToObject(sample_3star, "weight", 10000);	//3星权重 总权重10000
+	cJSON_AddItemToArray(three_stars, sample_3star);
+
 	cJSON_AddItemToArray(pools, pool_template);
 
 	char* json = cJSON_Print(root);
@@ -78,7 +85,7 @@ char* createGenshinJson()
 	return json;
 }
 
-// 解析UP物品
+// 解析物品
 Item* parse_items(cJSON* array, int* count) {
 	if (!cJSON_IsArray(array)) return NULL;
 
@@ -134,10 +141,10 @@ GachaPool parse_pool(cJSON* pool_obj) {
 	cJSON* up = cJSON_GetObjectItem(pool_obj, "up");
 	if (up) {
 		cJSON* star5 = cJSON_GetObjectItem(up, "5star");
-		pool.star5_up = parse_items(star5, &pool.star5_count);
+		pool.star5_up = parse_items(star5, &pool.star5_up_count);
 
 		cJSON* star4 = cJSON_GetObjectItem(up, "4star");
-		pool.star4_up = parse_items(star4, &pool.star4_count);
+		pool.star4_up = parse_items(star4, &pool.star4_up_count);
 	}
 
 	// 其他物品
@@ -148,6 +155,9 @@ GachaPool parse_pool(cJSON* pool_obj) {
 
 		cJSON* star4 = cJSON_GetObjectItem(up, "4star");
 		pool.star4_up = parse_items(star4, &pool.star4_others_count);
+
+		cJSON* star3 = cJSON_GetObjectItem(up, "3star");
+		pool.star3_others = parse_items(star3, &pool.star3_others_count);
 	}
 
 	return pool;
@@ -203,6 +213,7 @@ GachaConfig* parse_config(const char* json)
 	return config;
 }
 
+// 计算当前抽数的概率
 Probability* probability(int counts, GlobalConfig* config, GachaPool* pool) {
 	Probability* prob = malloc(sizeof(Probability));
 	int four_stars_times = counts % 10;
@@ -236,6 +247,16 @@ int random(double prob) {
 	else return 0;
 }
 
+int mult_random(double* prob, int size) {
+	double r = (double)rand() / RAND_MAX;
+	double sum = 0;
+	for (int i = 0; i < size; i++) {
+		sum += prob[i];
+		if (r < sum) return i;
+	}
+	return size - 1;
+}
+
 //抽卡主函数
 //return 3:3星 4:4星 5:5星
 int Gacha(Probability* prob) {
@@ -248,6 +269,49 @@ int Gacha(Probability* prob) {
 		else return 4;	//返回4星
 	}
 	else return 3;	//返回3星
+}
+
+Item* return_Item(GachaPool* pool, int stars) {
+	if (stars == 5) {
+		int if_up = random(0.5);
+		if (if_up == 1) {
+			Item* item = pool->star5_up;	//正常情况下，5星UP只有一个
+			return item;
+		}
+		else {
+			double* prob = malloc(pool->star5_others_count * sizeof(double));
+			for (int i = 0; i < pool->star5_others_count; i++) {
+				prob[i] = (double)pool->star5_others[i].weight / 10000;
+			}
+			int index = mult_random(prob, pool->star5_others_count);
+			Item* item = &pool->star5_others[index];
+			free(prob);
+			return item;
+	}
+	if (stars == 4) {
+		int if_up = random(0.5);
+		if (if_up == 1) {
+			double* prob = malloc(pool->star4_up_count * sizeof(double));
+			for (int i = 0; i < pool->star4_up_count; i++) {
+				prob[i] = (double)pool->star4_up[i].weight / 10000;
+			}
+			int index = mult_random(prob, pool->star4_up_count);
+			Item* item = &pool->star4_up[index];
+			free(prob);
+			return item;
+		}
+		else {
+			double* prob = malloc(pool->star4_others_count * sizeof(double));
+			for (int i = 0; i < pool->star4_others_count; i++) {
+				prob[i] = (double)pool->star4_others[i].weight / 10000;
+			}
+			int index = mult_random(prob, pool->star4_others_count);
+			Item* item = &pool->star4_others[index];
+			free(prob);
+			return item;
+			}
+		}
+	}
 }
 
 //解析抽卡结果

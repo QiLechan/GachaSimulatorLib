@@ -34,7 +34,7 @@ int i = 1;
 FILE* fp2;
 fopen_s(&fp2, "result.txt", "wb");
 int five_star_count = 0;
-for (int counts = 1; counts <= 1000000; counts++)
+for (int counts = 1; counts <= 10; counts++)
 {
 	Probability* prob = probability(i, &config->global, &config->pools[0]);
 	i++;

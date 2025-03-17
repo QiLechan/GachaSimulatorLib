@@ -21,16 +21,24 @@ typedef struct {
 typedef struct {
     char pool_name[50];
     char pool_type[20];
+
     int soft_pity_start;
     double rate_increment;
+
     Item* star5_up;
-    int star5_count;
+    int star5_up_count;
+
     Item* star4_up;
-    int star4_count;
+    int star4_up_count;
+
 	Item* star5_others;
 	int star5_others_count;
+
 	Item* star4_others;
 	int star4_others_count;
+
+	Item* star3_others;
+	int star3_others_count;
 } GachaPool;
 
 typedef struct {
