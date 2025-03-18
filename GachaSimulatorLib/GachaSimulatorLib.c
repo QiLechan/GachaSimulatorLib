@@ -150,16 +150,15 @@ GachaPool parse_pool(cJSON* pool_obj) {
 	// 其他物品
 	cJSON* others = cJSON_GetObjectItem(pool_obj, "others");
 	if (others) {
-		cJSON* star5 = cJSON_GetObjectItem(up, "5star");
+		cJSON* star5 = cJSON_GetObjectItem(others, "5star");
 		pool.star5_up = parse_items(star5, &pool.star5_others_count);
 
-		cJSON* star4 = cJSON_GetObjectItem(up, "4star");
+		cJSON* star4 = cJSON_GetObjectItem(others, "4star");
 		pool.star4_up = parse_items(star4, &pool.star4_others_count);
 
-		cJSON* star3 = cJSON_GetObjectItem(up, "3star");
+		cJSON* star3 = cJSON_GetObjectItem(others, "3star");
 		pool.star3_others = parse_items(star3, &pool.star3_others_count);
 	}
-
 	return pool;
 }
 
@@ -312,23 +311,21 @@ Item* return_Item(GachaPool* pool, int stars) {
 			}
 		}
 	}
+	else {
+		double* prob = malloc(pool->star3_others_count * sizeof(double));
+		for (int i = 0; i < pool->star3_others_count; i++) {
+			prob[i] = (double)pool->star3_others[i].weight / 10000;
+		}
+		int index = mult_random(prob, pool->star3_others_count);
+		Item* item = &pool->star3_others[index];
+		free(prob);
+		return item;
+	}
 }
 
 //解析抽卡结果
-void parse_result(int result, FILE* fp) {
-	switch (result) {
-	case 3:
-		fprintf(fp, "抽到了3星\n");
-		break;
-	case 4:
-		fprintf(fp, "抽到了4星\n");
-		break;
-	case 5:
-		fprintf(fp, "抽到了5星\n");
-		break;
-	default:
-		break;
-	}
+void parse_result(Item* item, FILE* fp) {
+	fprintf(fp, "%s\n", item->name);
 }
 
 
