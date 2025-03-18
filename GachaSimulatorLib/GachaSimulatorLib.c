@@ -151,10 +151,10 @@ GachaPool parse_pool(cJSON* pool_obj) {
 	cJSON* others = cJSON_GetObjectItem(pool_obj, "others");
 	if (others) {
 		cJSON* star5 = cJSON_GetObjectItem(others, "5star");
-		pool.star5_up = parse_items(star5, &pool.star5_others_count);
+		pool.star5_others = parse_items(star5, &pool.star5_others_count);
 
 		cJSON* star4 = cJSON_GetObjectItem(others, "4star");
-		pool.star4_up = parse_items(star4, &pool.star4_others_count);
+		pool.star4_others = parse_items(star4, &pool.star4_others_count);
 
 		cJSON* star3 = cJSON_GetObjectItem(others, "3star");
 		pool.star3_others = parse_items(star3, &pool.star3_others_count);
@@ -286,8 +286,9 @@ Item* return_Item(GachaPool* pool, int stars) {
 			Item* item = &pool->star5_others[index];
 			free(prob);
 			return item;
+		}
 	}
-	if (stars == 4) {
+	else if (stars == 4) {
 		int if_up = random(0.5);
 		if (if_up == 1) {
 			double* prob = malloc(pool->star4_up_count * sizeof(double));
@@ -308,7 +309,6 @@ Item* return_Item(GachaPool* pool, int stars) {
 			Item* item = &pool->star4_others[index];
 			free(prob);
 			return item;
-			}
 		}
 	}
 	else {
