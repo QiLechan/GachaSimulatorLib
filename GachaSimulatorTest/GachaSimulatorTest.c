@@ -4,6 +4,7 @@
 #include <GachaSimulatorLib.h>  
 #include <Windows.h>  
 #include <time.h>
+#include <stdbool.h>
 
 int main()  
 {  
@@ -34,12 +35,13 @@ int main()
     FILE* fp2;
     fopen_s(&fp2, "result.txt", "wb");
     int five_star_count = 0;
+    bool* up5star = false;      // 大保底机制
     for (int counts = 1; counts <= 1000; counts++)
     {
         Probability* prob = probability(i, &config->global, &config->pools[0]);
         i++;
         int result = Gacha(prob);
-        Item* item = return_Item(&config->pools[0], result);
+        Item* item = return_Item(&config->pools[1], result, up5star);
         if (result == 5)
         {
             i = 1;

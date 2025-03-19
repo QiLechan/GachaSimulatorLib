@@ -2,6 +2,7 @@
 #define _GACHA_SIMULATOR_LIB_H_
 
 #include <cjson/cJSON.h>
+#include <stdbool.h>
 
 char* createGenshinJson();
 
@@ -57,7 +58,7 @@ typedef struct {
 GachaConfig* parse_config(const char* json);
 Probability* probability(int times, GlobalConfig* config, GachaPool* pool);
 int Gacha(Probability* prob);
-Item* return_Item(GachaPool* pool, int stars);
+Item* return_Item(GachaPool* pool, int stars, bool* up5star);
 void parse_result(Item* item, FILE* fp);
 
 #endif

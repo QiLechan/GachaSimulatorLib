@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "GachaSimulatorLib.h"
+#include <stdbool.h>
 
 // 创建原神初始JSON配置
 char* createGenshinJson()
@@ -270,8 +271,13 @@ int Gacha(Probability* prob) {
 	else return 3;	//返回3星
 }
 
-Item* return_Item(GachaPool* pool, int stars) {
+Item* return_Item(GachaPool* pool, int stars, bool* up5star) {
 	if (stars == 5) {
+		if (up5star)
+		{
+			up5star = false;
+			return pool->star5_up;
+		}
 		int if_up = random(0.5);
 		if (if_up == 1) {
 			Item* item = pool->star5_up;	//正常情况下，5星UP只有一个
@@ -285,6 +291,7 @@ Item* return_Item(GachaPool* pool, int stars) {
 			int index = mult_random(prob, pool->star5_others_count);
 			Item* item = &pool->star5_others[index];
 			free(prob);
+			up5star = true;
 			return item;
 		}
 	}
