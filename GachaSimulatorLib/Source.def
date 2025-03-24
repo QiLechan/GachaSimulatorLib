@@ -1,0 +1,9 @@
+LIBRARY GachaSimulatorLib
+
+EXPORTS
+	createGenshinJson
+	parse_config
+	probability
+	Gacha
+	return_Item
+	parse_result
