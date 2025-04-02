@@ -26,6 +26,7 @@ char* createGenshinJson()
 	cJSON* pools = cJSON_AddArrayToObject(root, "pools");
 	cJSON* pool_template = cJSON_CreateObject();
 	cJSON_AddItemToObject(pool_template, "pool_name", cJSON_CreateString("常驻祈愿"));
+	cJSON_AddItemToObject(pool_template, "pool_backgound", cJSON_CreateString(""));
 	cJSON_AddItemToObject(pool_template, "pool_type", cJSON_CreateString("角色"));
 
 	//概率
@@ -123,6 +124,10 @@ GachaPool parse_pool(cJSON* pool_obj) {
 	cJSON* name = cJSON_GetObjectItem(pool_obj, "pool_name");
 	if (cJSON_IsString(name))
         strncpy_s(pool.pool_name, sizeof(pool.pool_name), name->valuestring, sizeof(pool.pool_name) - 1);
+
+	cJSON* background = cJSON_GetObjectItem(pool_obj, "pool_backgound");
+	if (cJSON_IsString(background))
+		strncpy_s(pool.pool_backgound, sizeof(pool.pool_backgound), background->valuestring, sizeof(pool.pool_backgound) - 1);
 
 	cJSON* type = cJSON_GetObjectItem(pool_obj, "pool_type");
 	if (cJSON_IsString(type))

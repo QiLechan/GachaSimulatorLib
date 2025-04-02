@@ -21,6 +21,7 @@ typedef struct {
 
 typedef struct {
     char pool_name[50];
+    char pool_backgound[50];
     char pool_type[20];
 
     int soft_pity_start;
