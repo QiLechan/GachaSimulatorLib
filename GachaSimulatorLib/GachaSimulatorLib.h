@@ -1,4 +1,4 @@
-#ifndef _GACHA_SIMULATOR_LIB_H_
+﻿#ifndef _GACHA_SIMULATOR_LIB_H_
 #define _GACHA_SIMULATOR_LIB_H_
 
 #include <cjson/cJSON.h>
@@ -17,11 +17,12 @@ typedef struct {
     char name[50];
     int id;
     int weight;
+    char pic_path[100];
 } Item;
 
 typedef struct {
     char pool_name[50];
-    char pool_background[50];
+    char pool_background[100];
     char pool_type[20];
 
     int soft_pity_start;

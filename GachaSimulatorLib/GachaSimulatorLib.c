@@ -47,12 +47,14 @@ char* createGenshinJson()
 	cJSON_AddStringToObject(sample_5star, "name", "五星UP角色");
 	cJSON_AddNumberToObject(sample_5star, "id", 10001);
 	cJSON_AddNumberToObject(sample_5star, "weight", 5000);	//5星权重 总权重10000
+	cJSON_AddStringToObject(sample_5star, "pic_path", "");
 	cJSON_AddItemToArray(five_stars, sample_5star);
 
 	cJSON* sample_4star = cJSON_CreateObject();
 	cJSON_AddStringToObject(sample_4star, "name", "四星UP角色");
 	cJSON_AddNumberToObject(sample_4star, "id", 20001);
 	cJSON_AddNumberToObject(sample_4star, "weight", 5000);	//4星权重 总权重10000
+	cJSON_AddStringToObject(sample_4star, "pic_path", "");
 	cJSON_AddItemToArray(four_stars, sample_4star);
 
 	//UP以外
@@ -66,18 +68,21 @@ char* createGenshinJson()
 	cJSON_AddStringToObject(sample_5star, "name", "五星角色");
 	cJSON_AddNumberToObject(sample_5star, "id", 10001);
 	cJSON_AddNumberToObject(sample_5star, "weight", 5000);	//5星权重 总权重10000
+	cJSON_AddStringToObject(sample_5star, "pic_path", "");
 	cJSON_AddItemToArray(five_stars, sample_5star);
 
 	sample_4star = cJSON_CreateObject();
 	cJSON_AddStringToObject(sample_4star, "name", "四星角色");
 	cJSON_AddNumberToObject(sample_4star, "id", 10001);
 	cJSON_AddNumberToObject(sample_4star, "weight", 5000);	//4星权重 总权重10000
+	cJSON_AddStringToObject(sample_4star, "pic_path", "");
 	cJSON_AddItemToArray(four_stars, sample_4star);
 
 	cJSON* sample_3star = cJSON_CreateObject();
 	cJSON_AddStringToObject(sample_3star, "name", "三星物品");
 	cJSON_AddNumberToObject(sample_3star, "id", 30001);
 	cJSON_AddNumberToObject(sample_3star, "weight", 10000);	//3星权重 总权重10000
+	cJSON_AddStringToObject(sample_3star, "pic_path", "");
 	cJSON_AddItemToArray(three_stars, sample_3star);
 
 	cJSON_AddItemToArray(pools, pool_template);
@@ -109,6 +114,10 @@ Item* parse_items(cJSON* array, int* count) {
 
 			cJSON* weight = cJSON_GetObjectItem(item, "weight");
 			if (cJSON_IsNumber(weight)) _item.weight = weight->valueint;
+
+			cJSON* pic_path = cJSON_GetObjectItem(item, "pic_path");
+			if (cJSON_IsString(pic_path))
+				strncpy_s(_item.pic_path, sizeof(_item.pic_path), pic_path->valuestring, sizeof(_item.pic_path) - 1);
 
 			items[(*count)++] = _item;
 		}
